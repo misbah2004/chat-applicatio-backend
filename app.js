@@ -43,45 +43,58 @@ import cors from "cors";
 
 const app = express();
 app.use(cors());
-const server = http.createServer(app);
 
+const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173"], // Change to your frontend domain when live
     methods: ["GET", "POST"],
   },
 });
 
-let users = {}; // { socketId: username }
+let users = {}; // socket.id -> username
 
 io.on("connection", (socket) => {
-  console.log("✅ New connection:", socket.id);
+  console.log("User connected:", socket.id);
 
-  // Handle new user join
+  // User joins with username
   socket.on("join", (username) => {
     users[socket.id] = username;
-    console.log(`${username} joined!`);
-    io.emit("user-list", users); // broadcast updated list
+    console.log(`${username} joined as ${socket.id}`);
+
+    // Notify all users of new list
+    io.emit("user-list", users);
   });
 
-  // Private message
+  // Private messaging
   socket.on("private-message", ({ to, message }) => {
-    const sender = users[socket.id];
+    const senderName = users[socket.id];
+    const time = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
     io.to(to).emit("receive-message", {
       message,
-      sender,
       from: socket.id,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      sender: senderName,
+      time,
     });
   });
 
-  // Disconnect
+  // Handle disconnection
   socket.on("disconnect", () => {
-    console.log(`${users[socket.id]} left`);
+    console.log("User disconnected:", socket.id);
     delete users[socket.id];
-    io.emit("user-list", users);
+    io.emit("user-list", users); // Update user list for everyone
   });
 });
 
-server.listen(3000, () => console.log("🚀 Server running on http://localhost:3000"));
+app.get("/", (req, res) => {
+  res.send("Socket.io Chat Server Running 🚀");
+});
+
+server.listen(3000, () => {
+  console.log("✅ Server running on http://localhost:3000");
+});
 
