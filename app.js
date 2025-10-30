@@ -46,7 +46,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["https://chat-frontend-two-black.vercel.app"], // ✅ no trailing slash
+    origin: "*", // ✅ no trailing slash
     methods: ["GET", "POST"],
   },
 });
