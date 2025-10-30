@@ -47,7 +47,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"], // Change to your frontend domain when live
+    origin: ["https://chat-frontend-two-black.vercel.app/"], // Change to your frontend domain when live
     methods: ["GET", "POST"],
   },
 });
