@@ -35,6 +35,9 @@
 // server.listen(port, () => {
 //   console.log(`Server is running on port ${port}`);
 // });
+
+
+
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
@@ -46,7 +49,7 @@ app.use(cors());
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["https://chat-frontend-two-black.vercel.app"],
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
